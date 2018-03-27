@@ -1,5 +1,6 @@
 package com.azhan.news.UI;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -8,8 +9,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.azhan.news.Adapter.NewsAdapter;
@@ -34,26 +41,29 @@ public class MainActivity extends AppCompatActivity {
     List<NewsData> newsDatas;
     LinearLayout reload;
     SwipeRefreshLayout refreshNews;
+    String country = "id";
+    String category = "";
+    String apiKey = "d9ed37cef7f84f26841e0d7fb6079ebb";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTitle("Berita");
         initialVariable();
-        refresh(connectionCheck());
+        refresh(connectionCheck(), category);
         refreshNews.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refresh(connectionCheck());
+                refresh(connectionCheck(), category);
             }
         });
     }
 
-    private void refresh(Boolean check){
+    private void refresh(Boolean check, final String category){
         if (check){
             reload.setVisibility(View.GONE);
             refreshNews.setVisibility(View.VISIBLE);
-            showNews();
+            showNews(category);
         } else{
             reload.setVisibility(View.VISIBLE);
             refreshNews.setVisibility(View.GONE);
@@ -62,20 +72,93 @@ public class MainActivity extends AppCompatActivity {
             reload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    refresh(connectionCheck());
+                    refresh(connectionCheck(), category);
                 }
             });
         }
+        Log.d("kategorynya", category);
     }
 
-    private void showNews() {
+    private void showRadioButtonDialog() {
+
+        // custom dialog
+        final Dialog dialog = new Dialog(MainActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.kategori_radio_button_layout);
+        List<String> stringList=new ArrayList<>();  // here is list
+        for(int i=0;i<5;i++) {
+            stringList.add("RadioButton " + (i + 1));
+        }
+        RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.categoryRG);
+
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (radioGroup.getCheckedRadioButtonId()){
+                    case R.id.bisnisRB:
+                        category = "business";
+                        setTitle("Berita (Bisnis)");
+                        break;
+                    case R.id.hiburanRB:
+                        category = "entertainment";
+                        setTitle("Berita (Hiburan)");
+                        break;
+                    case R.id.kesehatanRB:
+                        category = "health";
+                        setTitle("Berita (Kesehatan)");
+                        break;
+                    case R.id.olahragaRB:
+                        category = "sports";
+                        setTitle("Berita (Olahraga)");
+                        break;
+                    case R.id.teknologiRB:
+                        category = "technology";
+                        setTitle("Berita (Teknologi)");
+                        break;
+                    case R.id.umumRB:
+                        category = "general";
+                        setTitle("Berita (Umum)");
+                        break;
+                    case R.id.sainsRB:
+                        category = "science";
+                        setTitle("Berita (Sains)");
+                        break;
+                    case R.id.semuaRB:
+                        category = "";
+                        setTitle("Berita");
+                    default:
+                        break;
+                }
+                dialog.dismiss();
+                refresh(connectionCheck(), category);
+            }
+        });
+        dialog.show();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.mymenu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.mybutton) {
+            // do something here
+            showRadioButtonDialog();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showNews(String category) {
         ConnectionApi connectionApi = new ConnectionApi();
         Retrofit retrofit = connectionApi.service();
         NewsInterface newsInterface = retrofit.create(NewsInterface.class);
         newsDatas = new ArrayList<>();
-        String country = "id";
-        String category = "business";
-        String apiKey = "d9ed37cef7f84f26841e0d7fb6079ebb";
         Call<NewsApi> call = newsInterface.getNews(country, category, apiKey);
         call.enqueue(new Callback<NewsApi>() {
             @Override
