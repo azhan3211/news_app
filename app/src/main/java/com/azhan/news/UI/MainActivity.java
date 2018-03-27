@@ -3,6 +3,7 @@ package com.azhan.news.UI;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView.Adapter newsAdapter;
     List<NewsData> newsDatas;
     LinearLayout reload;
+    SwipeRefreshLayout refreshNews;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,16 +41,23 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Berita");
         initialVariable();
         refresh(connectionCheck());
+        refreshNews.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh(connectionCheck());
+                refreshNews.setRefreshing(false);
+            }
+        });
     }
 
     private void refresh(Boolean check){
         if (check){
             reload.setVisibility(View.GONE);
-            newsRecyclerView.setVisibility(View.VISIBLE);
+            refreshNews.setVisibility(View.VISIBLE);
             showNews();
         } else{
             reload.setVisibility(View.VISIBLE);
-            newsRecyclerView.setVisibility(View.GONE);
+            refreshNews.setVisibility(View.GONE);
             Toast.makeText(MainActivity.this, "Tidak Ada Koneksi ke Internet", Toast.LENGTH_SHORT).show();
             reload.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -100,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         newsRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayout.VERTICAL, false));
         newsDatas = new ArrayList<>();
         reload = (LinearLayout) findViewById(R.id.reloadLL);
+        refreshNews = (SwipeRefreshLayout) findViewById(R.id.refreshNews);
     }
 
     private Boolean connectionCheck(){

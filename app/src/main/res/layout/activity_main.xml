@@ -17,18 +17,23 @@
         <ImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:background="@drawable/ic_reload"
-            />
+            android:background="@drawable/ic_reload"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tidak ada koneksi internet"/>
+            android:gravity="center"
+            android:text="Tidak ada koneksi internet \n Klik untuk refresh"/>
     </LinearLayout>
-    <android.support.v7.widget.RecyclerView
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none"
-        android:background="#fff"
-        android:id="@+id/newsRV"/>
+        android:id="@+id/refreshNews">
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none"
+            android:background="#fff"
+            android:id="@+id/newsRV"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
