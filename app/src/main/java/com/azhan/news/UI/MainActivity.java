@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 refresh(connectionCheck());
-                refreshNews.setRefreshing(false);
             }
         });
     }
@@ -58,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         } else{
             reload.setVisibility(View.VISIBLE);
             refreshNews.setVisibility(View.GONE);
+            refreshNews.setRefreshing(false);
             Toast.makeText(MainActivity.this, "Tidak Ada Koneksi ke Internet", Toast.LENGTH_SHORT).show();
             reload.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         ConnectionApi connectionApi = new ConnectionApi();
         Retrofit retrofit = connectionApi.service();
         NewsInterface newsInterface = retrofit.create(NewsInterface.class);
-
+        newsDatas = new ArrayList<>();
         String country = "id";
         String category = "business";
         String apiKey = "d9ed37cef7f84f26841e0d7fb6079ebb";
@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 newsAdapter = new NewsAdapter(MainActivity.this, newsDatas);
                 newsRecyclerView.setAdapter(newsAdapter);
+                refreshNews.setRefreshing(false);
             }
 
             @Override
@@ -107,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
     private void initialVariable() {
         newsRecyclerView = (RecyclerView) findViewById(R.id.newsRV);
         newsRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayout.VERTICAL, false));
-        newsDatas = new ArrayList<>();
         reload = (LinearLayout) findViewById(R.id.reloadLL);
         refreshNews = (SwipeRefreshLayout) findViewById(R.id.refreshNews);
     }
