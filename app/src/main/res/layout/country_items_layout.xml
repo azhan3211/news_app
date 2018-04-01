@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:id="@+id/countryContainerLL"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="IN"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:id="@+id/countryCodeTV"
+        android:padding="10dp"/>
+    <TextView
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:text="-"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Indonesia"
+        android:id="@+id/countryNameTV"
+        android:paddingLeft="10dp"
+        android:textSize="20sp"/>
+
+</LinearLayout>

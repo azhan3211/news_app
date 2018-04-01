@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.azhan.news.UI.DetailNews" />
+        <activity android:name="com.azhan.news.UI.CountrySelect" />
     </application>
 
 </manifest>

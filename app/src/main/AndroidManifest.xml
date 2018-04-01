@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".UI.DetailNews"></activity>
+        <activity android:name=".UI.CountrySelect"></activity>
     </application>
 
 </manifest>

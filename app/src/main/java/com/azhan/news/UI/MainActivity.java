@@ -2,6 +2,7 @@ package com.azhan.news.UI;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,6 +21,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.azhan.news.Adapter.NewsAdapter;
+import com.azhan.news.Data.NewsPreferences;
 import com.azhan.news.Model.NewsApi;
 import com.azhan.news.Model.NewsData;
 import com.azhan.news.Network.ConnectionApi;
@@ -44,26 +46,52 @@ public class MainActivity extends AppCompatActivity {
     String country = "id";
     String category = "";
     String apiKey = "d9ed37cef7f84f26841e0d7fb6079ebb";
+    NewsPreferences newsPreferences;
+    private Menu menu;
+    MenuItem menuItem;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTitle("Berita");
         initialVariable();
-        refresh(connectionCheck(), category);
+        if(newsPreferences.getCategory(MainActivity.this) != null) {
+            category = newsPreferences.getCategory(MainActivity.this);
+            setTitle("Berita ("+category+")");
+        }
+        if(newsPreferences.getCountry(MainActivity.this) != null){
+            country = newsPreferences.getCountry(MainActivity.this);
+            refresh(connectionCheck(), category, country);
+        } else
+            refresh(connectionCheck(), category, country);
         refreshNews.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refresh(connectionCheck(), category);
+                refresh(connectionCheck(), category, country);
             }
         });
+
     }
 
-    private void refresh(Boolean check, final String category){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                country = data.getStringExtra("country");
+                newsPreferences.saveCountry(MainActivity.this, country);
+                refresh(connectionCheck(), category, country);
+                menuItem = menu.findItem(R.id.countryNews);
+                menuItem.setTitle(country);
+            }
+        }
+    }
+
+    private void refresh(Boolean check, final String category, final String country){
         if (check){
             reload.setVisibility(View.GONE);
             refreshNews.setVisibility(View.VISIBLE);
-            showNews(category);
+            showNews(category, country);
         } else{
             reload.setVisibility(View.VISIBLE);
             refreshNews.setVisibility(View.GONE);
@@ -72,14 +100,14 @@ public class MainActivity extends AppCompatActivity {
             reload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    refresh(connectionCheck(), category);
+                    refresh(connectionCheck(), category, country);
                 }
             });
         }
         Log.d("kategorynya", category);
     }
 
-    private void showRadioButtonDialog() {
+    private void showRadioButtonCategoryNewsDialog() {
 
         // custom dialog
         final Dialog dialog = new Dialog(MainActivity.this);
@@ -129,8 +157,9 @@ public class MainActivity extends AppCompatActivity {
                     default:
                         break;
                 }
+                newsPreferences.saveCategory(MainActivity.this, category);
                 dialog.dismiss();
-                refresh(connectionCheck(), category);
+                refresh(connectionCheck(), category, country);
             }
         });
         dialog.show();
@@ -140,6 +169,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.mymenu, menu);
+        this.menu = menu;
+        if(newsPreferences.getCountry(MainActivity.this) != null)
+            menu.findItem(R.id.countryNews).setTitle(newsPreferences.getCountry(MainActivity.this));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -147,14 +179,20 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.mybutton) {
+        if (id == R.id.categoryNews) {
             // do something here
-            showRadioButtonDialog();
+            showRadioButtonCategoryNewsDialog();
+        }
+
+        if (id == R.id.countryNews) {
+//            showRadioButtonCountryNewsDialog();
+            Intent intent = new Intent(MainActivity.this, CountrySelect.class);
+            startActivityForResult(intent,1);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void showNews(String category) {
+    private void showNews(String category, String country) {
         ConnectionApi connectionApi = new ConnectionApi();
         Retrofit retrofit = connectionApi.service();
         NewsInterface newsInterface = retrofit.create(NewsInterface.class);
@@ -193,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
         newsRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayout.VERTICAL, false));
         reload = (LinearLayout) findViewById(R.id.reloadLL);
         refreshNews = (SwipeRefreshLayout) findViewById(R.id.refreshNews);
+        newsPreferences = new NewsPreferences();
     }
 
     private Boolean connectionCheck(){

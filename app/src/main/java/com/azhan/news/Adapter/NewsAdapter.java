@@ -40,15 +40,17 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         final NewsData item = news.get(position);
         holder.title.setText(item.getTitle());
-        holder.author.setText(" "+item.getAuthor());
-        holder.source.setText("Sumber : "+item.getSource());
+        holder.source.setText(item.getSource());
         String[] splitDate = item.getDate().split("-");
         final String tanggal = splitDate[2].substring(0,2);
         final String bulan = months[Integer.parseInt(splitDate[1])-1];
         final String tahun = splitDate[0];
         holder.date.setText(" "+tanggal+" "+bulan+" "+tahun);
         holder.description.setText(item.getDescription());
-        Picasso.with(activity).load(item.getImage()).error(R.drawable.ic_launcher_background).into(holder.image);
+        if(item.getImage() != null)
+            Picasso.with(activity).load(item.getImage()).error(R.drawable.ic_launcher_background).into(holder.image);
+        else
+            holder.image.setImageResource(R.drawable.ic_launcher_background);
         holder.newsLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,13 +76,12 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView title, author, date, description, source;
+        private TextView title, date, description, source;
         private ImageView image;
         private LinearLayout newsLL;
         public ViewHolder(View itemView) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.titleTV);
-            author = (TextView) itemView.findViewById(R.id.authorTV);
             source = (TextView) itemView.findViewById(R.id.sourceTV);
             date = (TextView) itemView.findViewById(R.id.dateTV);
             description = (TextView) itemView.findViewById(R.id.descriptionTV);

@@ -65,13 +65,13 @@ public class DetailNews extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         finish();
-        overridePendingTransition(R.anim.slide_out_up, R.anim.slide_out_up);
+        overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
         return true;
     }
 
     @Override
     public void onBackPressed() {
         finish();
-        overridePendingTransition(R.anim.slide_out_up, R.anim.slide_in_up);
+        overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up);
     }
 }

@@ -1,7 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/mybutton"
+        android:id="@+id/countryNews"
+        android:title="IN"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/categoryNews"
         android:title=""
         app:showAsAction="always"
         android:icon="@drawable/ic_category"/>
